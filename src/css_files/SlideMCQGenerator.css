@@ -1,0 +1,32 @@
+.answer_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.correct_answers {
+    background-color: rgb(79, 169, 79);
+}
+
+.incorrect_answers {
+    background-color: rgb(152, 42, 42);
+}
+
+.normal_answers {
+    background-color: rgb(73, 109, 227);
+}
+
+.checked_answers {
+    background-color: rgb(4, 33, 126);
+}
+
+.answer_button {
+    flex-grow: 1;
+    width: 90%;
+    margin: 1rem;
+}
+
+.answer-wrapper {
+    display: flex;
+    flex-direction: row;
+}

@@ -1,0 +1,109 @@
+/* Navbar.css */
+
+.navbar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 12rem;
+  background-color: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.navbar.closed {
+  width: 3rem; /* shrinks when closed */
+}
+
+.navbar__title {
+  margin: 1rem;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+}
+
+.navbar.closed .navbar__title {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.navbar__list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.navbar__item {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.3s ease;
+  width: 100%;
+  border-radius: 0;
+  margin: 0;
+}
+
+.navbar.closed .navbar__item {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.navbar__user-info {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+  padding: 1rem;
+}
+
+.navbar.closed .navbar__user-info {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.navbar__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  right: -20px;  /* keep it outside navbar */
+  width: 24px;
+  height: 40px;
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 0 5px 5px 0;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-weight: bold;
+  transition: background-color 0.2s ease, right 0.3s ease;
+  z-index: 1100;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  outline: none;
+}
+
+/* When navbar is closed, shift button closer */
+.navbar.closed .toggle-button {
+  right: -12px;
+  width: 20px;
+  height: 36px;
+}
