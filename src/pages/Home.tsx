@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../stores/userStore';
 import { useSnackBarStore } from '../stores/snackBarStore';
 import { useQuestionsStore } from '../stores/useQuestionsStore';
+import { useInformationStore } from '../stores/informationStore';
 
 const backendURL = import.meta.env.VITE_BACKEND
 /**
@@ -31,6 +32,8 @@ const Home: React.FC = () => {
   const [processed, setProcessed] = useState(false);
   const [fileType, setFileType] = useState<'pdf' | 'pptx' | 'docx' | 'doc'>('pdf');
   const createSnackBar = useSnackBarStore((state) => state.createSnackBar)
+  const informationStore = useInformationStore((state) => state)
+  const questionStore = useQuestionsStore((state) => state)
 
   const user = useUserStore((state) => state.user)
   useEffect(() => {
@@ -63,7 +66,9 @@ const Home: React.FC = () => {
   const processFile = async (file: File) => {
     setLoading(true);
     setProcessed(false);
-
+    informationStore.reset();
+    questionStore.reset();
+    questionStore.resetCache();
     const formData = new FormData();
     formData.append('file', file);
 

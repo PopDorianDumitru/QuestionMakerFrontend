@@ -3,6 +3,7 @@ import type { Question } from '../types/Question';
 
 type QuestionsStore = {
     questions: Question[];
+    cachedQuestions: Question[];
     currentQuestion: number;
 
     setQuestions: (questions: Question[]) => void;
@@ -14,12 +15,17 @@ type QuestionsStore = {
     updateQuestion: (index: number, newQuestion: Partial<Question>) => void;
     hasPreviousQuestion: () => boolean;
     hasNextQuestion: () => boolean;
+    getNumberOfQuestions: () => number;
+    getQuestion: (index: number) => Question;
+    cacheQuestions: () => void;
     reset: () => void;
+    resetCache: () => void;
 };
 
 export const useQuestionsStore = create<QuestionsStore>((set, get) => ({
   questions: [],
   currentQuestion: 0,
+  cachedQuestions: [],
 
   setQuestions: (questions) => set({ questions }),
 
@@ -58,5 +64,12 @@ export const useQuestionsStore = create<QuestionsStore>((set, get) => ({
   hasPreviousQuestion: () => get().currentQuestion > 0,
   hasNextQuestion: () => get().currentQuestion < get().questions.length - 1,
 
+  getNumberOfQuestions: () => get().questions.length,
+
+  getQuestion: (index) => get().questions[index],
+
+  cacheQuestions: () => set({ cachedQuestions: [ ...get().cachedQuestions,...get().questions] }),
+
   reset: () => set({ questions: [], currentQuestion: 0 }),
+  resetCache: () => set({ cachedQuestions: [] }),
 }));
