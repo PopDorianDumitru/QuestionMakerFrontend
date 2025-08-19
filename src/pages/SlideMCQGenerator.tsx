@@ -6,7 +6,7 @@ import { useUserStore } from '../stores/userStore';
 import { type User } from 'firebase/auth';
 // import { useSnackBarStore } from '../stores/snackBarStore';
 import { useQuestionsStore } from '../stores/useQuestionsStore';
-import { useInformationStore } from '../stores/informationStore';
+import { useInformationStore, type InformationState } from '../stores/informationStore';
 import type { Question } from '../types/Question';
 const backendURL = import.meta.env.VITE_BACKEND
 
@@ -29,12 +29,13 @@ function groupRandomChunks<T>(slides: T[], groupSize: number = 3): T[][] {
   return groups;
 }
 
-async function generateMCQ(group: SlideGroup, user: User | null, addQuestion: (question: Question) => void): Promise<string> {
+async function generateMCQ(group: SlideGroup, user: User | null, addQuestion: (question: Question) => void, informationStore: InformationState): Promise<string> {
   console.log("Rendering SlideMCQGenerator");
 
   const slides = group.map((slide, index) => `Slide ${index + 1}: ${slide}`).join('\n');
   const response = await axios.post(`${backendURL}/generate_question`, {
-    topic: `${slides}`
+    topic: `${slides}`,
+    instructions: `${informationStore.getCustomPrompt()}`
   }, { headers: {Authorization: `Bearer ${await user?.getIdToken()}`} })
   .catch((error) => {
     console.error(error); 
@@ -112,7 +113,7 @@ const SlideMCQGenerator: React.FC = () => {
       }
       const groups = informationStore.getStructuredInformation();
       console.log(groups)
-      generateMCQ(groups[currentIndex], user, addQuestion)
+      generateMCQ(groups[currentIndex], user, addQuestion, informationStore)
       .then(() => {
         console.log("Done with first question");
         setLoading(false);
@@ -123,11 +124,11 @@ const SlideMCQGenerator: React.FC = () => {
         setSelectedAnswers(new Set());
         setChecked(false);
         if(currentIndex < groups.length - 1) {
-          generateMCQ(groups[currentIndex + 1], user, addQuestion)
+          generateMCQ(groups[currentIndex + 1], user, addQuestion, informationStore)
           .then(() => {
             console.log("Done with second question");
             if(currentIndex < groups.length - 2) {
-              generateMCQ(groups[currentIndex + 2], user, addQuestion)
+              generateMCQ(groups[currentIndex + 2], user, addQuestion, informationStore)
               .then(() => {
                 console.log("Done with third question");
               })
@@ -145,7 +146,7 @@ const SlideMCQGenerator: React.FC = () => {
       setSelectedAnswers(new Set());
       setChecked(false);
       if(currentIndex < allGroups.length - 2) {
-        generateMCQ(allGroups[currentIndex + 2], user, addQuestion)
+        generateMCQ(allGroups[currentIndex + 2], user, addQuestion, informationStore)
         .then(() => {
           console.log("Done with follow up question");
         })

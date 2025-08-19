@@ -2,10 +2,13 @@ import { create } from 'zustand'
 
 type SlideGroup = string[];
 
-type InformationState = {
+export type InformationState = {
     information: string,
     structuredInformation: SlideGroup[],
     currentInformation: number,
+    customPrompt: string,
+    setCustomPrompt: (customPrompt: string) => void,
+    getCustomPrompt: () => string,
     setCurrentInformation: (currentInformation: number) => void,
     setStructuredInformation: (structuredInformation: SlideGroup[]) => void,
     setInformation: (information: string) => void,
@@ -21,6 +24,9 @@ export const useInformationStore = create<InformationState>((set, get) => ({
     information: '',
     structuredInformation: [],
     currentInformation: 0,
+    customPrompt: '',
+    setCustomPrompt: (customPrompt: string) => set({customPrompt: customPrompt}),
+    getCustomPrompt: () => get().customPrompt,
     setCurrentInformation: (currentInformation: number) => set({currentInformation: currentInformation}),
     setStructuredInformation: (structuredInformation: SlideGroup[]) => set({structuredInformation: structuredInformation}),
     setInformation: (information: string) => set({information: information}),

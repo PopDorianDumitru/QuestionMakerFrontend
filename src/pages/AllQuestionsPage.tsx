@@ -11,7 +11,7 @@ const AllQuestionsPage = () => {
     const setCurrentQuestion = useQuestionsStore((state) => state.setCurrentQuestion)
     const informationStore = useInformationStore((state) => state)
     const generateQuizPDF = () => {
-        const seenQuestions = questions.filter((question, index) => index <= informationStore.getIndex())
+        const seenQuestions = questions.filter((_, index) => index <= informationStore.getIndex())
         generateAnswerKeyPdf([...cachedQuestions, ...seenQuestions])
         generateQuizOnlyPdf([...cachedQuestions, ...seenQuestions])
     }

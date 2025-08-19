@@ -29,6 +29,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate()
   const [, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState<null | string>(null);
   const [processed, setProcessed] = useState(false);
   const [fileType, setFileType] = useState<'pdf' | 'pptx' | 'docx' | 'doc'>('pdf');
   const createSnackBar = useSnackBarStore((state) => state.createSnackBar)
@@ -125,9 +126,39 @@ const Home: React.FC = () => {
       />
 
       {loading && <CircularProgress />}
-
+      {processed && 
+        <div>
+          <FormControl margin="normal">
+            <label>
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) setCustomPrompt('');
+                  else setCustomPrompt(null);
+                }}
+              />{' '}
+              Use custom prompt
+            </label>
+            {customPrompt !== null && (
+              <textarea
+                placeholder="Enter custom prompt"
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                rows={4} // controls height
+                style={{ display: 'block', marginTop: '8px', width: '100%', padding: '8px', fontSize: '14px' }}
+              />
+            )}
+          </FormControl>
+        </div>
+      }
       {processed && (
-        <Button variant="contained" color="primary" onClick={() => navigate('/question')}>
+        <Button variant="contained" color="primary" onClick={() => {
+            navigate('/question')
+            if(customPrompt !== null)
+              informationStore.setCustomPrompt(customPrompt); 
+            else 
+              informationStore.setCustomPrompt('');
+          }}>
           Create questions for file
         </Button>
       )}
