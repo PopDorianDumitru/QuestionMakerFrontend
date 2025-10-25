@@ -7,7 +7,7 @@ import { useUserStore } from './stores/userStore';
 import Navbar from './components/Navbar';
 import { Snackbar } from '@mui/material';
 import { useSnackBarStore } from './stores/snackBarStore';
-import triviabara from "../public/triviabara.svg";
+// import triviabara from "../public/triviabara.svg";
 
 onAuthStateChanged(auth, (user) => {
   useUserStore.getState().setUser(user);
@@ -24,13 +24,13 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <AppRoutes />
-      <img src={triviabara} alt='triviabara' className='triviabara' />
+      <img src="/triviabara.svg" alt='triviabara' className='triviabara' />
       <Snackbar
               open={snackbarOpen}
               autoHideDuration={3000}
               onClose={() => setSnackbarOpen(false)}
               message={snackbarMessage}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               slotProps={{
                 content: {
                   style: {

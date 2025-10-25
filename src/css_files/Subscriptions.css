@@ -16,27 +16,97 @@
   gap: 2rem;
 }
 
-.subscriptions-container > div {
-  border: 0.3rem solid #222;
-  border-radius: 10px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  min-height: 300px; /* Optional, to ensure equal height */
-}
 
 .subscriptions-container h3 {
   margin-top: 0;
+  margin-bottom: 0;
   font-size: 1.5rem;
+  font-weight: 500;
 }
 
-.subscriptions-container ul {
-  list-style: disc;
-  padding-left: 1.2rem;
+.subscription-tier h2 {
+  margin-top: 0.4rem;
+  margin-bottom: -0.5rem;
+  font-size: 3rem;
+}
+
+
+.subscription-tier {
+  display: flex;
+  flex-direction: column;
+  align-items:start;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 1rem;
+  padding: 1rem;
+  border-color: lightgray;
+  margin-top: 20%;
+  box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.2);
+  -webkit-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.2);
+  flex: 1;
+  min-width: 10rem;
+}
+
+
+.price-subtext {
+  font-size: 0.8rem;
+  font-weight: bolder;
+  color: lightslategray;
+  margin: 0;
   text-align: left;
 }
 
-.subscriptions-container p {
+#premium-tier {
+  box-shadow: 0px 0px 5px 1px rgb(94, 126, 255);
+  -webkit-box-shadow: 0px 0px 5px 1px rgb(94, 126, 255);
+  -moz-box-shadow: 0px 0px 5px 1px rgb(94, 126, 255);
+}
+
+.list-subtext {
+  margin-top: 2rem;
+  margin-bottom: 0;
+  font-weight: bold;
+}
+
+.features-list {
+  margin-top: 0;
+  list-style: none;
+  text-align: left;
+  padding: 0;
+}
+
+.features-list li::before {
+  content: "✓ ";
+  color: green;
+  
+}
+
+.tier-button {
+  width: 100%;
   margin-top: auto;
-  font-size: 1.1rem;
+  border-style: solid;
+  border-width: 1px;
+  border-color: lightgray;
+  font-weight: 500;
+}
+
+.tier-button:hover {
+  border-color: darkgrey;
+
+}
+
+#preferred-subscription {
+  background-color: #17191c;
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease; 
+}
+
+#preferred-subscription:hover {
+  background-color: #2a2d33;
+  color: white;
+}
+
+.cancel-button {
+  margin-top: 3rem;
 }

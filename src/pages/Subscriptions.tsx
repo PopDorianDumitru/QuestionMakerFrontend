@@ -4,11 +4,14 @@ import "../css_files/Subscriptions.css";
 import axios from "axios";
 import { useUserStore } from "../stores/userStore";
 import { useSnackBarStore } from "../stores/snackBarStore";
+import { useNavigate } from "react-router-dom";
+import { loginWithGoogle } from "../auth/googleLogin";
 const backendURL = import.meta.env.VITE_BACKEND
 
 const Subscriptions: React.FC = () => {
 
   const user = useUserStore((state) => state.user);
+  const navigator = useNavigate();
   const createSnackBar = useSnackBarStore((state) => state.createSnackBar);
   const subscribe = async () => {
     if(!user) {
@@ -83,24 +86,41 @@ const Subscriptions: React.FC = () => {
 
   return (
     <div className="main-container">
-        <h1>Subscriptions</h1>
         <div className="subscriptions-container">
-            <div>
-                <h3>Free Tier</h3>
-                <ul>
-                    <li>Allows creation of one quizz</li>
+            <div className="subscription-tier">
+                <h3>Free</h3>
+                <h2>$0</h2>
+                <p className="price-subtext">For trying out the app</p>
+                <p className="list-subtext">
+                    One Time Access
+                </p>
+                <ul className="features-list">
+                    <li>Quiz Creation</li>
+                    <li>Custom Prompt</li>
+                    <li>PDF Export</li>
                 </ul>
+                <button onClick={async () => {
+                    if(!user) await loginWithGoogle();
+                    navigator('/upload');
+                }} className="tier-button">Get Started</button>
             </div>
-            <div>
-                <h3>Paid Tier</h3>
-                <ul>
-                    <li>Allows unlimited quizz creations</li>
+            <div className="subscription-tier" id="premium-tier">
+                <h3>Premium</h3>
+                <h2>$5</h2>
+                <p className="price-subtext">Per user, billed monthly</p>
+                <p className="list-subtext">
+                    Unlimited Access
+                </p>
+                <ul className="features-list">
+                    <li>Quiz Creation</li>
+                    <li>Custom Prompt</li>
+                    <li>PDF Export</li>
+                    <li>Future Updates</li>
                 </ul>
-                <p><strong>Price: 5$ (25 lei) per month</strong></p>
-                <button onClick={subscribe}>Subscribe</button>
+                <button id="preferred-subscription" className="tier-button" onClick={subscribe}>Subscribe</button>
             </div>
         </div>
-        <button onClick={unsubscribe}>Cancel Subscription</button>
+        <button className="tier-button cancel-button" onClick={unsubscribe}>Cancel Subscription</button>
     </div>
   );
 };

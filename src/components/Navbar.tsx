@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useUserStore } from '../stores/userStore'; // adjust path
 import { signOut, getAuth } from 'firebase/auth';
 import '../css_files/Navbar.css';
@@ -13,12 +13,6 @@ const Navbar: React.FC = () => {
   const navigator = useNavigate();
   const createSnackBar = useSnackBarStore((state) => state.createSnackBar);
   
-  const [isOpen, setIsOpen] = useState(true);
-
-  const toggleNavbar = () => {
-    setIsOpen((prev) => !prev);
-  };
-
   const logOut = () => {
     if(!window.confirm('Are you sure you want to log out?')) return
     
@@ -46,23 +40,30 @@ const Navbar: React.FC = () => {
   //   navigator('/legend');
   // }
 
+  const goToUpload = () => {
+    navigator('/upload');
+  }
+
   return (
-    <nav className={`navbar ${isOpen ? '' : 'closed'}`}>
-      <button className="toggle-button" onClick={toggleNavbar} aria-label="Toggle sidebar">
-        {isOpen ? '←' : '→'}
-      </button>
+    <nav className={`navbar`}>
 
       <h2 className="navbar__title">Triviabara</h2>
       <button className="navbar__item" onClick={goToHome}>Home</button>
       {/* <button className="navbar__item" onClick={goToLegend}>Legend</button> */}
+      <button className="navbar__item" onClick={goToUpload}>Generate</button>
       <button className="navbar__item" onClick={goToSubscription}>Subscriptions</button>
+
       {user && <ul className="navbar__list">
         <button className="navbar__item" onClick={logOut}>Log out</button>
       </ul>}
-      {!user && <ul className="navbar__list">
-        <button className="navbar__item" onClick={loginWithGoogle}>Log in</button>
+      {!user && <ul style={{flexGrow: "1", marginLeft: "auto", display: "flex", justifyContent: "flex-end", flexDirection: "row"}} className="navbar__list">
+        <button className="navbar__item" onClick={loginWithGoogle}>Sign in</button>
+        <button onClick={async () => {
+          await loginWithGoogle();
+          navigator("/upload");
+        }} className="navbar__item" id='getStarted'>Get Started</button>
       </ul>}
-      {user ? (
+      {user && (
         <div className="navbar__user-info">
           <img
             src={user.photoURL || undefined}
@@ -71,9 +72,8 @@ const Navbar: React.FC = () => {
           />
           <p style={{ margin: 0 }}>{user.displayName}</p>
         </div>
-      ) : isOpen && (
-        <p style={{ marginTop: 'auto', color: '#ccc', textWrap: 'nowrap' }}>Not logged in</p>
-      )}
+        ) 
+      }
     </nav>
   );
 };
