@@ -1,70 +1,62 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Button,
   CircularProgress,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel
 } from '@mui/material';
 import axios from 'axios';
-import '../css_files/Home.css';
+import '../css_files/Home.css'; // Make sure this CSS file includes the styles from the previous step
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../stores/userStore';
 import { useSnackBarStore } from '../stores/snackBarStore';
 import { useQuestionsStore } from '../stores/useQuestionsStore';
 import { useInformationStore } from '../stores/informationStore';
 
-const backendURL = import.meta.env.VITE_BACKEND
-/**
- * Home component allows users to upload a file and process it.
- * Users can select the file type (PDF, PowerPoint, or Word) via a dropdown menu.
- * Once a file is selected, it is processed by making a POST request to a server.
- * The component provides feedback to the user via a Snackbar about the success or failure of the file processing.
- * It also shows a loading indicator while the file is being processed.
- */
+const backendURL = import.meta.env.VITE_BACKEND;
 
+/**
+ * Home component allows users to upload a file via drag-and-drop or browsing.
+ * The component infers the file type (PDF, PPTX, DOCX) from the file extension.
+ * It processes the file by making a POST request to the server.
+ * Provides feedback via Snackbar and loading indicators.
+ */
 const Home: React.FC = () => {
-  const navigate = useNavigate()
-  const [, setFile] = useState<File | null>(null);
+  const navigate = useNavigate();
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [customPrompt, setCustomPrompt] = useState<null | string>(null);
   const [processed, setProcessed] = useState(false);
-  const [fileType, setFileType] = useState<'pdf' | 'pptx' | 'docx' | 'doc'>('pdf');
-  const createSnackBar = useSnackBarStore((state) => state.createSnackBar)
-  const informationStore = useInformationStore((state) => state)
-  const questionStore = useQuestionsStore((state) => state)
+  const createSnackBar = useSnackBarStore((state) => state.createSnackBar);
+  const informationStore = useInformationStore((state) => state);
+  const questionStore = useQuestionsStore((state) => state);
+  const user = useUserStore((state) => state.user);
+  const reset = useQuestionsStore((state) => state.reset);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const user = useUserStore((state) => state.user)
-  useEffect(() => {
-    localStorage.setItem('fileType', fileType);
-  }, [fileType])
+  /**
+   * Infers the file type string required by the API from the file's name.
+   */
+  const getInferredFileType = (fileName: string): string | null => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    if (!extension) return null;
 
-  const reset = useQuestionsStore((state) => state.reset)
-
-  const getAcceptString = (type: 'pdf' | 'pptx' | 'docx' | 'doc') => {
-    switch (type) {
+    switch (extension) {
       case 'pdf':
-        return '.pdf';
+        return 'pdf';
       case 'pptx':
-        return '.pptx';
+        return 'pptx';
+      case 'doc':
       case 'docx':
-        return '.doc,.docx';
+        return 'docx';
       default:
-        return '.pdf,.pptx,.doc,.docx';
+        return null; // Unsupported type
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      processFile(selectedFile);
-    }
-  };
-
-  const processFile = async (file: File) => {
+  /**
+   * Processes the file by sending it to the backend.
+   */
+  const processFile = async (file: File, inferredType: string) => {
     setLoading(true);
     setProcessed(false);
     informationStore.reset();
@@ -75,90 +67,213 @@ const Home: React.FC = () => {
 
     try {
       const res = await axios.post(
-        `${backendURL}/transform/${fileType}`,
+        `${backendURL}/transform/${inferredType}`, // Use the inferred type in the URL
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${await user?.getIdToken()}` }, }
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${await user?.getIdToken()}`,
+          },
+        }
       );
       const message: string = res.data.message ?? 'File processed successfully!';
       const document: string = res.data.document;
       localStorage.setItem('slides', JSON.stringify(document));
       setProcessed(true);
-      createSnackBar(message, 'success')
-      reset()
+      createSnackBar(message, 'success');
+      reset();
     } catch (err) {
       let errorMsg = 'Network error';
       if (axios.isAxiosError(err)) {
-        errorMsg = err.response?.data?.message ?? "Please make sure you are logged in and you are subscribed";
+        errorMsg =
+          err.response?.data?.message ??
+          'Please make sure you are logged in and you are subscribed';
       }
-      createSnackBar(errorMsg, 'error')
+      createSnackBar(errorMsg, 'error');
       console.error('Upload failed:', errorMsg);
+      // Clear file on failure
+      handleRemoveFile();
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * A central handler for when a file is selected (via drop or browse).
+   * It validates the file type and triggers processing.
+   */
+  const handleFileSelect = (selectedFile: File | undefined) => {
+    if (!selectedFile) {
+      setUploadedFile(null);
+      return;
+    }
+
+    const inferredType = getInferredFileType(selectedFile.name);
+
+    if (!inferredType) {
+      createSnackBar(
+        'Unsupported file type. Please upload a PDF, DOCX, PPTX.',
+        'error'
+      );
+      setUploadedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''; // Clear input
+      }
+      return;
+    }
+
+    setUploadedFile(selectedFile);
+    processFile(selectedFile, inferredType); // Pass file and inferred type
+  };
+
+  // --- Input/Drop Handlers ---
+
+  const onInternalFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    handleFileSelect(selectedFile);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.add('drag-over');
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('drag-over');
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  // --- UI Action Handlers ---
+
+  const handleBrowseClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+    setProcessed(false); // Reset processed state
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the file input value
+    }
+  };
+
+  const handleGenerateClick = () => {
+    navigate('/question');
+    if (customPrompt !== null) {
+      informationStore.setCustomPrompt(customPrompt);
+    } else {
+      informationStore.setCustomPrompt('');
+    }
+  };
+
   return (
-    <div className="container">
+    <div className="container-generate">
       <Typography variant="h5" gutterBottom>
-        Upload your file
+        <b>Upload your file to generate quizzes</b>
+      </Typography>
+      <Typography variant="body1" component="p" gutterBottom>
+        Supports PDF, DOCX, and PPTX formats
       </Typography>
 
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="file-type-label">File Type</InputLabel>
-        <Select
-          labelId="file-type-label"
-          value={fileType}
-          label="File Type"
-          onChange={(e) => setFileType(e.target.value as 'pdf' | 'pptx' | 'docx' | 'doc')}
+      <div className="file-upload-container">
+        {/* Hidden actual file input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={onInternalFileChange}
+          accept=".pdf,.pptx,.doc,.docx" // Accept all supported types
           disabled={loading}
-        >
-          <MenuItem value="pdf">PDF</MenuItem>
-          <MenuItem value="pptx">PowerPoint (.pptx)</MenuItem>
-          <MenuItem value="docx">Word (.doc/.docx)</MenuItem>
-        </Select>
-      </FormControl>
+          style={{ display: 'none' }}
+        />
 
-      <input
-        type="file"
-        onChange={handleFileChange}
-        accept={getAcceptString(fileType)}
-        disabled={loading}
-      />
+        {/* Show drop zone only if no file is uploaded and not loading */}
+        {!uploadedFile && !loading && (
+          <div
+            className="drop-zone"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleBrowseClick}
+          >
+            <div className="upload-icon-wrapper">
+              <img 
+                src="/cloud-upload.svg" 
+                alt="Upload file icon" 
+                className="upload-cloud-icon" 
+            />
+            </div>
+            <p>Drag & drop your file here</p>
+            <p>or click to browse</p>
+          </div>
+        )}
 
-      {loading && <CircularProgress />}
-      {processed && 
-        <div>
-          <FormControl margin="normal">
-            <label>
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  if (e.target.checked) setCustomPrompt('');
-                  else setCustomPrompt(null);
-                }}
-              />{' '}
-              Use custom prompt
-            </label>
-            {customPrompt !== null && (
-              <textarea
-                placeholder="Enter custom prompt"
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                rows={4} // controls height
-                style={{ display: 'block', marginTop: '8px', width: '100%', padding: '8px', fontSize: '14px' }}
-              />
-            )}
-          </FormControl>
+        {/* Show loading indicator */}
+        {loading && (
+          <div className="loading-container" style={{ padding: '40px 0' }}>
+            <CircularProgress />
+            <Typography variant="body1" style={{ marginTop: '15px' }}>
+              Processing file...
+            </Typography>
+          </div>
+        )}
+
+        {/* Show uploaded file info */}
+        {uploadedFile && !loading && (
+          <div className="uploaded-file-info">
+            <img 
+                src="/cloud-upload.svg" 
+                alt="Upload file icon" 
+                className="upload-cloud-icon-info" 
+            />
+            <span>{uploadedFile.name}</span>
+            <button
+              onClick={handleRemoveFile}
+              className="remove-file-button"
+              disabled={loading}
+            >
+              &times;
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Custom Prompt Section */}
+      {processed && !loading && (
+          <div className="custom-prompt-input-container">
+            <textarea
+              className="prompt-textarea" // Key class for styling
+              placeholder="Optional: enter your custom prompt here (e.g., 'Generate 10 hard multiple choice questions about...')"
+              value={customPrompt || ''}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+              rows={3} // Set a default number of rows
+            />
+          {/* Optional: Add a subtle 'Send' icon or button here if you want to emphasize the input */}
         </div>
-      }
-      {processed && (
-        <Button variant="contained" color="primary" onClick={() => {
-            navigate('/question')
-            if(customPrompt !== null)
-              informationStore.setCustomPrompt(customPrompt); 
-            else 
-              informationStore.setCustomPrompt('');
-          }}>
+      )}
+
+      {/* Generate Button Section */}
+      {processed && !loading && ( 
+        <Button
+          className='generate-quiz-button'
+          variant="contained"
+          onClick={handleGenerateClick}
+          disabled={loading} // Redundant check, but good practice
+        >
           Create questions for file
         </Button>
       )}

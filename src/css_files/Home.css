@@ -1,0 +1,273 @@
+.container-generate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 6rem;
+    border-style: solid;
+    border-width: 3px;
+    border-color: #666;
+    width: 40%;
+    border-radius: 1rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.file-input {
+    width: 50%;
+    height: 10rem;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-style: dashed;
+    border-color: rgb(224, 224, 224);
+    border-width: 2px;
+    color: rgb(53, 53, 53);
+    font-weight: bold;
+    stroke-dasharray: 5 30;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+/* --- Base Container --- */
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Space between elements */
+  padding: 1rem 2rem;
+  max-width: 600px; /* Adjust as needed */
+  margin: 0 auto;
+}
+
+/* --- Drop Zone --- */
+.drop-zone {
+  width: 100%;
+  padding: 40px 20px;
+  border: 2px solid #ccc; /* Lighter dashes */
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  box-sizing: border-box; /* Include padding in width/height */
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: #9438d1; /* Blue border on hover */
+  box-shadow: 0 0 5px #9438d1; /* Blue shadow on hover */
+}
+
+.drop-zone p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.drop-zone p:first-of-type {
+    font-weight: 500;
+}
+
+/* --- Upload Icon --- */
+.upload-icon-wrapper {
+  margin-bottom: 15px;
+}
+
+.upload-cloud-icon {
+  height: 4rem;
+}
+.upload-cloud-icon-info {
+  height: 2rem;
+}
+
+/* --- Uploaded File Info --- */
+.uploaded-file-info {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 1rem;
+  background-color: #fff;
+  width: 100%;
+  max-width: 350px; /* Limit width */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.uploaded-file-info .file-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.uploaded-file-info span {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.uploaded-file-info .remove-file-button {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 5px;
+  margin-left: 10px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.uploaded-file-info .remove-file-button:hover {
+  color: #f00;
+}
+
+
+/* Progress Bar (if you want to add it) */
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, #6EE7B7, #9333EA); /* Gradient */
+    width: 0%; /* Control with JavaScript */
+    transition: width 0.3s ease-out;
+}
+
+
+/* --- Generate Quiz Button --- */
+.generate-quiz-button {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  border: none;
+  border-radius: 1rem;
+  color: white;
+  padding: 20rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+.generate-quiz-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+/* File type segmented control (optional, if you add it) */
+.file-type-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.file-type-button {
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #555;
+}
+
+.file-type-button.active {
+    background: linear-gradient(to right, #6EE7B7, #9333EA);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.file-type-button:hover:not(.active) {
+    background-color: #e8e8e8;
+}
+
+
+.custom-prompt-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none; 
+}
+
+.custom-prompt-checkbox input[type="checkbox"] {
+    /* Style the checkbox slightly if needed, but default is usually fine */
+    margin-right: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #9333EA; /* Use your teal brand color for the checkmark */
+}
+
+/* --- Prompt Textarea Container (The ChatGPT-style Box) --- */
+.custom-prompt-input-container {
+    margin-top: 0;
+    position: relative;
+    border: 1px solid #e0e0e0; /* Light gray border */
+    border-radius: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Very subtle shadow */
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    width: 80%;
+    margin-bottom: 1rem;
+}
+
+/* --- Prompt Textarea (The Input Field) --- */
+.prompt-textarea {
+    width: 100%;
+    min-height: 80px; /* Minimum height for usability */
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+    
+    border: none;
+    outline: none;
+    resize: vertical; 
+    box-sizing: border-box; 
+    
+    
+    border-radius: 1rem;
+    background-color: transparent;
+    
+    
+    &::placeholder {
+        color: #999;
+    }
+}
+
+
+.prompt-input-container:focus-within {
+    border-color: #9333EA;
+    box-shadow: 0 0 0 0.2rem #ae76e2
+}
