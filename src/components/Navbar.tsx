@@ -65,11 +65,11 @@ const Navbar: React.FC = () => {
       </ul>}
       {user && (
         <div className="navbar__user-info">
-          <img
+          {(user.photoURL &&<img
             src={user.photoURL || undefined}
             alt="Profile"
             className="navbar__avatar"
-          />
+          />)}
           <p style={{ margin: 0 }}>{user.displayName}</p>
         </div>
         ) 

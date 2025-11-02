@@ -4,7 +4,6 @@ import "../css_files/SlideMCQGenerator.css"
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../stores/userStore';
 import { type User } from 'firebase/auth';
-// import { useSnackBarStore } from '../stores/snackBarStore';
 import { useQuestionsStore } from '../stores/useQuestionsStore';
 import { useInformationStore, type InformationState } from '../stores/informationStore';
 import type { Question } from '../types/Question';
