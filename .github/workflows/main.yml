@@ -1,0 +1,76 @@
+# --------------------------------------------------------------------------------
+# WORKFLOW NAME: Deploy Frontend to S3 and Invalidate CloudFront
+# --------------------------------------------------------------------------------
+name: Deploy Frontend to Production
+
+# --------------------------------------------------------------------------------
+# 1. TRIGGER
+# --------------------------------------------------------------------------------
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# --------------------------------------------------------------------------------
+# 2. GLOBAL PERMISSIONS
+# --------------------------------------------------------------------------------
+permissions:
+  id-token: write
+  contents: read
+
+# --------------------------------------------------------------------------------
+# 3. JOBS
+# --------------------------------------------------------------------------------
+jobs:
+  deploy:
+    environment: production
+    
+    runs-on: ubuntu-latest
+    
+    env:
+      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      
+      BUILD_FOLDER: ./build
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------------
+      # ----------------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.12.2'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Frontend Application
+        run: npm run build
+        
+      # ----------------------------------------
+      # AWS OIDC Authentication & Deployment
+      # ----------------------------------------
+      - name: Configure AWS Credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PRODUCTION_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Deploy Static Files to S3 Bucket
+        run: |
+          echo "Syncing files from ${{ env.BUILD_FOLDER }} to s3://${{ env.S3_BUCKET_NAME }}"
+          aws s3 sync ${{ env.BUILD_FOLDER }} s3://${{ env.S3_BUCKET_NAME }} --delete
+        
+      - name: Create CloudFront Cache Invalidation
+        run: |
+          echo "Invalidating CloudFront Distribution ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}"
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+          echo "Deployment to production successful!"
