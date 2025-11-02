@@ -36,7 +36,7 @@ jobs:
       AWS_PRODUCTION_ROLE_NAME: ${{ secrets.AWS_PRODUCTION_ROLE_NAME }}
       AWS_ROLE_PRODUCTION_ARN: ${{ secrets.AWS_ROLE_PRODUCTION_ARN }}
       
-      BUILD_FOLDER: ./build
+      BUILD_FOLDER: ./dist
 
     steps:
       - name: Checkout Repository
