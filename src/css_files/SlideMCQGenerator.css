@@ -73,6 +73,7 @@
 
 .generated-question-container {
     width: 50%;
+    height: 100%;
     border-style: solid;
     border-radius: 1rem;
     border-width: 1px;
@@ -117,6 +118,17 @@
     margin-top: 1rem;
 }
 
+.generated-question-button:hover {   
+    background: linear-gradient(-45deg, #c26043, #a72b5a, #19799c, #189779);
+    background-size: 400% 400%; /* Important for the animation to have space to move */
+    animation: textGradient 15s ease infinite;
+    color: white;
+    border: none;
+    height: 100%;
+    border-radius: 1rem;
+    margin-top: 1rem;
+}
+
 .generated-question-button:disabled {
     background: grey;
     color: black;
@@ -129,3 +141,30 @@
     justify-content: space-between;
     width: 100%;
 }
+
+.question-button {
+    outline: goldenrod;
+    border: 1px solid goldenrod;
+    border-radius: 1rem;
+    background-color: transparent;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: left;
+    margin-bottom: 0.7rem;
+}
+
+.control-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.whole-line-buttons {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 50%;
+}
+
