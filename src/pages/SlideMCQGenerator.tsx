@@ -161,6 +161,7 @@ const SlideMCQGenerator: React.FC = () => {
 
 
   const toggleAnswer = (option: string) => {
+    if (checked) return;
     const newSet = new Set(selectedAnswers);
     if (newSet.has(option)) {
       newSet.delete(option);
@@ -171,6 +172,7 @@ const SlideMCQGenerator: React.FC = () => {
   };
 
   const handleCheckAnswers = () => {
+    if (checked) return;
     updateQuestion(questionIndex, { selectedAnswers: Array.from(selectedAnswers) });
     setChecked(true);
   };
@@ -195,12 +197,12 @@ const SlideMCQGenerator: React.FC = () => {
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="generated-question-container">
       {loading ? (
         <p>Loading question...</p>
       ) : (
-        <div className="mb-4 p-4 border rounded shadow">
-          <p className="mb-4 whitespace-pre-line">{currentQuestion}</p>
+        <div>
+          <p className="question-text">{currentQuestion}</p>
           <div className='answer_container'>
             
           {Object.entries(answers).map(([option, text]) => {
@@ -208,13 +210,13 @@ const SlideMCQGenerator: React.FC = () => {
             const correct = isCorrect(option);
             const incorrect = isIncorrect(option);
             return (
-              <div className='answer_wrapper'>
+              <div className='answer-wrapper'>
+                <div className='answer-choice'>{option}</div>
                 <button
                   key={option}
                   onClick={() => toggleAnswer(option)}
                   className={`
-                    w-full text-left px-4 py-3 rounded-lg font-medium border 
-                    transition-all duration-200 mb-3 answer_button
+                    answer_button
                     ${
                       checked
                         ? correct
@@ -228,20 +230,20 @@ const SlideMCQGenerator: React.FC = () => {
                     }
                   `}
                 >
-                  <strong>{option}:</strong> {text}
+                  <p className='answer-text'>{text}</p>
                 </button>
               </div>
             );
           })}
           {checked && (
-            <p>You picked: {[...selectedAnswers].join(', ')}</p>
+            <p style={{ margin: '0'}}>You picked: {[...selectedAnswers].sort().join(', ')}</p>
           )}
           </div>  
-          <div className="mt-4 flex gap-4">
-            {!checked && (
+          <div className='control-buttons'>
+            {(
               <button
                 onClick={handleCheckAnswers}
-                className="bg-yellow-500 text-white px-4 py-2 rounded"
+                className="generated-question-button"
                 disabled={selectedAnswers.size === 0}
               >
                 Check Answers
@@ -250,7 +252,7 @@ const SlideMCQGenerator: React.FC = () => {
             {checked && (
               <button
                 onClick={handleNext}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
+                className="generated-question-button"
               >
                 Next Question
               </button>
@@ -258,10 +260,10 @@ const SlideMCQGenerator: React.FC = () => {
           </div>
         </div>
       )}
-      <button onClick={() => navigator('/allQuestions')}>
+      <button className='generated-question-button' onClick={() => navigator('/allQuestions')}>
         See All Questions
       </button>
-      <button onClick={exitQuiz}>
+      <button className='generated-question-button' onClick={exitQuiz}>
         Exit Quiz
       </button>
     </div>
