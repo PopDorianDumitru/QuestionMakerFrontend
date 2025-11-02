@@ -34,7 +34,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_PRODUCTION_ROLE_ARN: ${{ secrets.AWS_PRODUCTION_ROLE_ARN }}
       AWS_PRODUCTION_ROLE_NAME: ${{ secrets.AWS_PRODUCTION_ROLE_NAME }}
-
+      AWS_ROLE_PRODUCTION_ARN: ${{ secrets.AWS_ROLE_PRODUCTION_ARN }}
       
       BUILD_FOLDER: ./build
 
@@ -62,9 +62,9 @@ jobs:
       - name: Configure AWS Credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-account-id: ${{ env.AWS_PRODUCTION_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_ROLE_PRODUCTION_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-          role-name: ${{ env.AWS_PRODUCTION_ROLE_NAME }}
+
           
       - name: Deploy Static Files to S3 Bucket
         run: |
