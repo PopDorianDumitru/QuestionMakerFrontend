@@ -25,19 +25,21 @@ const GeneratedQuestion: React.FC = () => {
     }
 
     return (
-        <div className="p-6 max-w-3xl mx-auto">
+        <div className="generated-question-container">
         <div className="mb-4 p-4 border rounded shadow">
-          <p className="mb-4 whitespace-pre-line">{question.question}</p>
+          <p className="question-text">{question.question}</p>
           <div className='answer_container'>
             
           {Object.entries(question.answers).map(([option, text]) => {
             const correct = question.correctAnswers.includes(option)
             return (
-              <div className='answer_wrapper'>
+              <div className='answer-wrapper'>
+                <div className='answer-choice'>{option}</div>
                 <button
                   key={option}
 
                   onClick={() => {
+                    if (checkedAnswers) return
                     if (selectedAnswers.includes(option)) {
                       setSelectedAnswers(selectedAnswers.filter((answer) => answer !== option));
                       updateQuestion(index, { selectedAnswers: selectedAnswers.filter((answer) => answer !== option) });
@@ -58,7 +60,7 @@ const GeneratedQuestion: React.FC = () => {
                     }
                   `}
                 >
-                  <strong>{option}:</strong> {text}
+                  {text}
                 </button>
               </div>
             );
@@ -67,17 +69,19 @@ const GeneratedQuestion: React.FC = () => {
           </div>  
           
         </div>
-      <button onClick={resetQuestion}>Reset Question</button>
-      <button disabled={!hasPreviousQuestion()} onClick={previousQuestion}>
+        <div className="control-buttons">
+        <button className="generated-question-button" disabled={!hasPreviousQuestion()} onClick={previousQuestion}>
         Previous Question
       </button>
-      <button onClick={() => setCheckedAnswers(true)}>
+        <button className="generated-question-button" onClick={resetQuestion}>Reset Question</button>
+        <button className="generated-question-button" disabled={!hasNextQuestion()} onClick={nextQuestion}>
+          Next Question
+        </button>
+      </div>
+      <button className="generated-question-button" disabled={selectedAnswers.length === 0} onClick={() => setCheckedAnswers(true)}>
         Check Answers
       </button>
-      <button disabled={!hasNextQuestion()} onClick={nextQuestion}>
-        Next Question
-      </button>
-      <button onClick={() => nav("/allQuestions")}>
+      <button className="generated-question-button" onClick={() => nav("/allQuestions")}>
         All Questions
       </button>
     </div>
