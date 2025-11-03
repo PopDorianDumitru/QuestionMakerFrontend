@@ -73,7 +73,7 @@ const GeneratedQuestion: React.FC = () => {
         <button className="generated-question-button" disabled={!hasPreviousQuestion()} onClick={previousQuestion}>
         Previous Question
       </button>
-        <button className="generated-question-button" onClick={resetQuestion}>Reset Question</button>
+        <button className="generated-question-button" disabled={!checkedAnswers} onClick={resetQuestion}>Reset Question</button>
         <button className="generated-question-button" disabled={!hasNextQuestion()} onClick={nextQuestion}>
           Next Question
         </button>
